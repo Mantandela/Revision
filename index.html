@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taskboard app</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="./app.js" defer></script>
+</head>
+<body>  
+  <div id="main-parant">
+    <header role="banner">
+    <h1>FocusTasks 9212</h1>
+    <div id="live-analytics" class="live-analytics">
+        <p>
+            Total: <span id="total-count">0</span>
+            &nbsp;|&nbsp; Active: <span id="active-count">0</span>
+            &nbsp;|&nbsp; Done: <span id="done-count">0</span>
+        </p>
+    </div>
+</header>
+
+<main id="main-9212">
+
+    <div class="control">
+        <form id="add-task-form" aria-label="Add task">
+            <label for="task-input">New task</label>
+            <div>
+                <input type="text" id="task-input" name="task" required placeholder="Enter task description">
+                <button type="submit" id="add-btn-9212">Add Task</button>
+            </div>
+
+        </form>
+    </div>
+    <div class="task-section">
+        <section aria-labelledby="active-heading">
+            <h2 id="active-heading">Active Tasks</h2>
+
+            <ol id="active-list">
+           
+            </ol>
+        </section>
+
+        <section aria-labelledby="done-heading">
+            <h2 id="done-heading">Completed Tasks</h2>
+            <ol id="done-list" aria-live="polite" aria-relevant="additions removals">
+                <!-- Completed tasks will be moved here -->
+            </ol>
+        </section>
+    </div>
+
+</main>
+
+<footer>
+    <small>made with❤️ by Mantan</small>
+</footer>
+  </div>
+</body>
+</html>
