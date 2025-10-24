@@ -1,0 +1,39 @@
+# ADR 001: Implementing a Task Management Application with Local Storage Persistence 
+
+## Context
+The goal of this project is to build a lightweight, browser-based Taskboard application named "FocusTasks 9212".  
+The app should allow users to add, complete, and delete tasks, with live analytics showing total, active, and completed task counts.  
+It should function entirely on the client side with data persistence even after page reloads.
+
+## Decision
+The application was implemented using **HTML, CSS, and Vanilla JavaScript** without any frameworks.  
+The app uses the browser’s **localStorage API** for saving tasks locally, instead of a backend database.  
+A closure-based store (`createStore()`) was designed to abstract localStorage operations such as adding, toggling, and removing tasks.  
+Dynamic DOM manipulation was used for rendering tasks and updating analytics in real time.
+
+## Pros
+1. Zero Backend Dependency: The application is purely client-side, eliminating the need for a server, database, or API, which simplifies deployment and reduces operational costs.
+2. Instant Persistence: Task data is immediately saved upon modification, providing a seamless user experience upon returning to the app.
+3. Simple State Management: The createStore closure provides a clear, encapsulated way to manage the state, preventing global scope pollution and making the code predictable.
+4. Offline Functionality: Since all data is stored locally, the application is fully functional even when the user is offline.
+
+## Cons
+1. Limited Data Scalability: Local Storage has a size limit (typically 5MB-10MB), making it unsuitable for applications with large amounts of data. This is acceptable for a simple personal task list.
+2. No Cross-Device Sync: Data is tied to the specific browser and device. Tasks added on one computer will not appear on another.
+3. Synchronous Operations: Local Storage operations are synchronous, which can potentially block the main thread and cause UI jank if the stored data set becomes very large. For this small task application, the impact is negligible.
+
+## Consequences
+- Simplicity: The app runs on any browser without setup or dependencies.  
+- Persistence: Tasks remain available even after refreshing or closing the browser.  
+- Accessibility: The UI includes semantic HTML elements (like `<main>`, `<header>`, and `<section>`) and ARIA attributes.  
+- Limitation: Tasks are stored per browser and device; no cloud sync.  
+- Security: localStorage is not encrypted, so data is readable in the console.
+
+## Future Improvements
+- Add a confirmation modal before deleting tasks.  
+- Implement edit functionality for task titles.  
+- Sync tasks to an online database or API for cross-device access.  
+- Introduce light/dark themes for better user experience.
+
+## Status
+Accepted and Implemented.
