@@ -1,82 +1,141 @@
-const formElement = document.getElementById("add-task-form")
-const submitBtn = document.getElementById("add-btn-9212")
+// DOM references
+const formElement = document.getElementById("add-task-form");
+const submitBtn = document.getElementById("add-btn-9212");
+const errMsg = document.getElementById("err-msg");
+const SID4 = "9212"
+
+const store = createStore(`focustasks_${SID4}`)
+renderTasks(store.list())
 
 
-submitBtn.addEventListener("click",handleSubmit)
-let taskId = 1
-const taskArr = []
+submitBtn.addEventListener("click", handleSubmit);
 
-function handleSubmit(e){
-    e.preventDefault()
-    const taskName = formElement.elements["task"].value
+// Handle form submission
+function handleSubmit(e) {
+  e.preventDefault();
+  const taskName = formElement.elements["task"].value;
 
-    const task = {
-        id: taskId ++,
-        name:taskName,
-        status: "active"
-    }
+  if (!taskName || taskName.trim() === "") {
+    errMsg.innerText = "Taskfield is empty.Please Enter a task!";
+    return;
+  }
 
-    taskArr.push(task)
+  errMsg.innerText = "";
 
-    // console.log()
-    
-    document.getElementById("active-list").innerHTML=""
-    taskArr.map((tasks)=>{
-    
-        let activeTask = `
-      <li> ${tasks.name} <span class = "action-btn" >
-      <button class= "delete">Delete</button>
-       <button class= "edit">Edit</button> 
-       <button class= "complete">Complete</button> </span><li>
-    `
-        document.getElementById("active-list").innerHTML += activeTask;
-    })
-   
+  const task = {
+    id: Date.now(),
+    name: taskName,
+    status: "active"
+  };
+  store.add(task)
+  renderTasks(store.list());
 
-    console.log(taskArr)
+  formElement.elements["task"].value = "";
+  formElement.elements["task"].focus();
 }
 
-// Factory function to create a task store with a unique key
-// function createStore(key) {
-//     const storageKey = key;
+// Escape HTML to prevent XSS
+function escapeHTML(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
 
-//     // Retrieve current state from localStorage, or default to empty array
-//     function getState() {
-//         return JSON.parse(localStorage.getItem(storageKey)) || [];
-//     }
+function renderTasks(tasks) {
+  const activeList = document.getElementById("active-list");
+  const doneList = document.getElementById("done-list");
+  activeList.textContent = "";
+  doneList.textContent = "";
 
-//     // Save new state to localStorage and return a deep-cloned array
-//     function setState(state) {
-//         localStorage.setItem(storageKey, JSON.stringify(state));
-//         return [...state]; // ensures immutability
-//     }
+  tasks.forEach(task => {
+    const li = document.createElement("li");
+    const span = document.createElement("span");
+    span.className = "action-btn";
 
-//     return {
-//         // Add a new task object to the store
-//         add(task) {
-//             const state = getState();
-//             const newState = [...state, task];
-//             return setState(newState);
-//         },
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete";
+    deleteBtn.textContent = "Delete";
 
-//         // Toggle the 'done' status of a task by ID
-//         toggle(id) {
-//             const state = getState().map(task =>
-//                 task.id === id ? { ...task, done: !task.done } : task
-//             );
-//             return setState(state);
-//         },
 
-//         // Remove a task from the store by ID
-//         remove(id) {
-//             const state = getState().filter(task => task.id !== id);
-//             return setState(state);
-//         },
+    const completeBtn = document.createElement("button");
+    completeBtn.className = "complete";
+    completeBtn.textContent = task.done ? "Undo" : "Complete";
 
-//         // Return a deep-cloned list of all tasks
-//         list() {
-//             return [...getState()];
-//         }
-//     };
-// }
+    span.append(deleteBtn,completeBtn);
 
+    const taskTitle = escapeHTML(task.name);
+    li.innerHTML = `<span>${taskTitle}</span>`;
+    li.appendChild(span);
+
+    // To Delete events
+    deleteBtn.addEventListener("click", () => {
+      store.remove(task.id);
+      renderTasks(store.list());
+    });
+
+    // To mark complete events
+    completeBtn.addEventListener("click", () => {
+      store.toggle(task.id);
+      renderTasks(store.list());
+    });
+
+    // Append to correct list
+    if (task.done) {
+      doneList.appendChild(li);
+    } else {
+      activeList.appendChild(li);
+    }
+  });
+
+  // To Update analytics
+  const totalCount = tasks.length;
+  const doneCount = tasks.filter(t => t.done).length;
+  const activeCount = totalCount - doneCount;
+
+  document.getElementById("total-count").textContent = totalCount;
+  document.getElementById("active-count").textContent = activeCount;
+  document.getElementById("done-count").textContent = doneCount;
+}
+
+
+// Closure-based store for localStorage
+function createStore(key) {
+  const storageKey = key;
+
+  function getTasks() {
+    return JSON.parse(localStorage.getItem(storageKey)) || [];
+  }
+
+  function saveTask(tasks) {
+    localStorage.setItem(storageKey, JSON.stringify(tasks));
+    return [...tasks];
+  }
+
+  return {
+    // Add new task
+    add(task) {
+      const tasks = getTasks();
+      const newTasks = [...tasks, task];
+      saveTask(newTasks);
+    },
+
+    // Toggle task completion
+    toggle(id) {
+      const tasks = getTasks().map(task =>
+        task.id === id ? { ...task, done: !task.done } : task
+      );
+      saveTask(tasks);
+    },
+
+    // Remove task
+    remove(id) {
+      const tasks = getTasks().filter(task => task.id !== id);
+      return saveTask(tasks);
+    },
+
+    // List all tasks
+    list() {
+      return [...getTasks()];
+    }
+  };
+}
