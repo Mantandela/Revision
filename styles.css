@@ -62,11 +62,11 @@ header h1{
 }
 
 .live-analytics span#done-count {
-    color: #2e7d32; /* green for completed */
+    color: #2e7d32; 
 }
 
 .live-analytics span#active-count {
-    color: #f57c00; /* orange for active */
+    color: #f57c00; 
 }
 
 
@@ -153,7 +153,6 @@ header h1{
 
 .action-btn{
     --bg-delete: rgb(243, 48, 48);
-    --bg-edit:grey;
     ---bg-complete:rgb(22, 171, 86);
     display: flex;
     gap: .4em;
@@ -166,17 +165,13 @@ header h1{
     background: rgb(224, 224, 224);
     border-radius: 2px;
     font-size: x-small;
+    font-weight: bold;
 
 }
 
 .action-btn .delete:hover{
     background-color: var(--bg-delete)
 }
-
-.action-btn .edit:hover{
-    background-color: var(--bg-edit)
-}
-
 .action-btn .complete:hover{
     background-color: var(---bg-complete)
 }
